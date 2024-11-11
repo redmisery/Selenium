@@ -1,0 +1,12 @@
+log:
+  log_base_name: selenium
+  log_level: debug
+  log_format: '%(asctime)s %(filename)s->%(funcName)s line:%(lineno)d [%(levelname)s]%(message)s'
+  log_path: logs
+
+data:
+  data_path: data
+  public_data_path: data/public_data.yaml
+
+dirver:
+  dirver_path:

@@ -1,0 +1,4 @@
+test_modify_software_name.test_modify_name:
+  - test_login.test_login
+test_modify_software_name.test_change_maplayers:
+  - test_login.test_login
