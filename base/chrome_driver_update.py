@@ -1,4 +1,3 @@
-import time
 import traceback
 import zipfile
 from pathlib import Path
@@ -13,6 +12,12 @@ from webdriver_manager.drivers.chrome import ChromeDriver
 
 from common import LogUtils
 
+"""
+Author: 韩琰
+Date: 2024年11月18日
+Version: 1.0
+Description: Chrome驱动自动更新，4.26.1后，会自动获取最新驱动，无需手动更新，在此本功能废弃
+"""
 
 class ChromeDriverUpdate(ChromeDriverManager):
     """
@@ -26,7 +31,6 @@ class ChromeDriverUpdate(ChromeDriverManager):
     :param download_manager:下载管理器
     :param cache_manager:缓存管理器
     :param os_system_manager:操作系统管理器
-    :param Update_interval_time:更新间隔时间(单位：小时),默认无间隔
     """
 
     def __init__(
@@ -41,7 +45,6 @@ class ChromeDriverUpdate(ChromeDriverManager):
             download_manager: Optional[DownloadManager] = None,
             cache_manager: Optional[DriverCacheManager] = None,
             os_system_manager: Optional[OperationSystemManager] = None,
-            Update_interval_time:int = 0
     ):
         super().__init__(
             download_manager=download_manager,
@@ -59,26 +62,25 @@ class ChromeDriverUpdate(ChromeDriverManager):
             os_system_manager=os_system_manager
         )
         self.url = url
-        self.update_path = update_path
+        self.update_dir = update_path
         self.update_version = None
         self.dirver_version = None
-        self.drivers_path = None
-        self.Update_interval_time = Update_interval_time
+        self.driver_path = None
 
-    def __get_download_path(self) -> str:
+    def __get_download_dir(self) -> Path:
         """
         获取默认下载保存路径
         :return: 路径
         """
-        if self.update_path is None:
+        if self.update_dir is None:
             user_home = Path.home()
             driver_home = user_home / '.wdm/drivers/chromedriver' / self.get_os_type()
             driver_home.mkdir(parents=True, exist_ok=True)
-            return str(driver_home)
+            return driver_home
         else:
-            self.update_path = Path(self.update_path).resolve().__str__()
-            Path(self.update_path).mkdir(parents=True, exist_ok=True)
-            return self.update_path
+            self.update_dir = Path(self.update_dir).resolve()
+            Path(self.update_dir).mkdir(parents=True, exist_ok=True)
+            return self.update_dir
 
     def __get_current_version(self) -> str:
         """
@@ -120,37 +122,29 @@ class ChromeDriverUpdate(ChromeDriverManager):
         is_need = True
         browser_version = self.__get_current_version()
         # 若update_path指定了路径，则使用指定路径，否则使用默认路径
-        self.update_path = self.__get_download_path()
-        driver_path = Path(self.update_path)
+        self.update_dir = self.__get_download_dir()
+        driver_dir = self.update_dir
         # 如果dirver_path目录存在且目录不为空
-        if driver_path.exists() and len(list(driver_path.iterdir())) > 0:
-            files = [file for file in driver_path.iterdir() if file.is_dir()]
+        if driver_dir.exists() and len(list(driver_dir.iterdir())) > 0:
+            files = [file for file in driver_dir.iterdir() if file.is_dir()]
             # 若版本文件夹为空，则直接返回True
             if len(files) != 0:
                 files.sort(key=lambda file: file.stat().st_mtime, reverse=True)
                 latest_driver_version = str(files[0].name)
-                # 检查当前时间-最新驱动时间>Update_interval_time*3600,则需要更新
-                if files[0].stat().st_mtime + 3600 * self.Update_interval_time < time.time():
-                    # 若latest_driver_version>=browser_version，则不需要更新
-                    if self.__compare_version(latest_driver_version, browser_version):
-                        # 检测是否存在chromedirver.exe
-                        file_path = driver_path / latest_driver_version / 'chromedriver.exe'
-                        self.drivers_path = file_path
-                        if file_path.exists():
-                            is_need = False
-                            debug_log = f'当前版本：{browser_version},不需要更新'
-                            LogUtils().debug(debug_log)
-                        else:
-                            is_need = True
-                            debug_log = f'当前版本：{browser_version},不需要更新，但是chromedriver.exe不存在,路径：{file_path}'
-                            LogUtils().debug(debug_log)
+                # 若latest_driver_version>=browser_version，则不需要更新
+                if self.__compare_version(latest_driver_version, browser_version):
+                    # 检测是否存在chromedirver.exe
+                    file_path = driver_dir / latest_driver_version / 'chromedriver.exe'
+                    self.driver_path = file_path
+                    if file_path.exists():
+                        is_need = False
+                        debug_log = f'当前版本：{browser_version},不需要更新'
+                        LogUtils().debug(debug_log)
                     else:
-                        is_need = True
-                        debug_log = f'当前版本：{browser_version},需要更新'
+                        debug_log = f'当前版本：{browser_version},不需要更新，但是chromedriver.exe不存在,路径：{file_path}'
                         LogUtils().debug(debug_log)
                 else:
-                    is_need = False
-                    debug_log = f'更新时间小于{self.Update_interval_time}，不更新！'
+                    debug_log = f'当前版本：{browser_version},需要更新'
                     LogUtils().debug(debug_log)
         return is_need
 
@@ -266,8 +260,8 @@ class ChromeDriverUpdate(ChromeDriverManager):
         """
         if self.__needUpdate():
             url = self.__get_file_url()
-            download_path = self.__get_download_path()
+            download_path = self.__get_download_dir()
             driver_path = self.__download(url, download_path)
             return driver_path
         else:
-            return self.drivers_path
+            return self.driver_path

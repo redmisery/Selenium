@@ -3,7 +3,7 @@ from common import PublicData
 
 
 class HomePage:
-    driver = Driver.driver
+    driver = Driver().driver
     public_data = PublicData()
     # 平台名称
     software_name = '#root > div > div.container___2L9JH.theme0___11dSN > div.titlebar___GyWMy > div.title___2Meyb > span'

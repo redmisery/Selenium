@@ -6,5 +6,3 @@ from base import Driver
 # print(b)
 
 a = Driver()
-if hasattr(a, 'path'):
-    print('a has path')
