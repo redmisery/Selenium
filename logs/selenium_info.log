@@ -1,24 +1,24 @@
-2024-11-07 10:50:58,201 conftest.py->test_collect line:31 [INFO]-------------------test start-------------------
-2024-11-07 10:50:58,220 conftest.py->test_collect line:32 [INFO]test data: {'username': 'root', 'password': '123', 'assert_type': 'in', 'expect': '密码错误'}
-2024-11-07 10:51:01,251 asserts.py->__assert_in line:59 [INFO]包含断言成功,预期：密码错误,实际：用户名或者密码错误.您还有4次机会
-2024-11-07 10:51:02,190 conftest.py->test_collect line:34 [INFO]-------------------test end-------------------
-2024-11-07 10:51:02,197 conftest.py->test_collect line:31 [INFO]-------------------test start-------------------
-2024-11-07 10:51:02,202 conftest.py->test_collect line:32 [INFO]test data: {'username': 'roo', 'password': 'jg123456', 'assert_type': 'in', 'expect': '密码错误'}
-2024-11-07 10:51:03,362 asserts.py->__assert_in line:59 [INFO]包含断言成功,预期：密码错误,实际：用户名或者密码错误.您还有4次机会
-2024-11-07 10:51:04,348 conftest.py->test_collect line:34 [INFO]-------------------test end-------------------
-2024-11-07 10:51:04,354 conftest.py->test_collect line:31 [INFO]-------------------test start-------------------
-2024-11-07 10:51:04,359 conftest.py->test_collect line:32 [INFO]test data: {'username': 777888456, 'password': None, 'assert_type': 'equal', 'expect': '用户名和密码不能为空'}
-2024-11-07 10:51:05,594 asserts.py->__assert_equal line:21 [INFO]相等断言成功,预期：用户名和密码不能为空,实际：用户名和密码不能为空
-2024-11-07 10:51:06,522 conftest.py->test_collect line:34 [INFO]-------------------test end-------------------
-2024-11-07 10:51:06,528 conftest.py->test_collect line:31 [INFO]-------------------test start-------------------
-2024-11-07 10:51:06,533 conftest.py->test_collect line:32 [INFO]test data: {'username': None, 'password': 'jg123456', 'assert_type': 'equal', 'expect': '用户名和密码不能为空'}
-2024-11-07 10:51:07,709 asserts.py->__assert_equal line:21 [INFO]相等断言成功,预期：用户名和密码不能为空,实际：用户名和密码不能为空
-2024-11-07 10:51:08,616 conftest.py->test_collect line:34 [INFO]-------------------test end-------------------
-2024-11-07 10:51:08,622 conftest.py->test_collect line:31 [INFO]-------------------test start-------------------
-2024-11-07 10:51:08,626 conftest.py->test_collect line:32 [INFO]test data: {'username': None, 'password': None, 'assert_type': 'equal', 'expect': '用户名和密码不能为空'}
-2024-11-07 10:51:09,198 asserts.py->__assert_equal line:21 [INFO]相等断言成功,预期：用户名和密码不能为空,实际：用户名和密码不能为空
-2024-11-07 10:51:10,226 conftest.py->test_collect line:34 [INFO]-------------------test end-------------------
-2024-11-07 10:51:10,232 conftest.py->test_collect line:31 [INFO]-------------------test start-------------------
-2024-11-07 10:51:10,237 conftest.py->test_collect line:32 [INFO]test data: {'username': 'root', 'password': 'jg123456', 'assert_type': 'equal', 'expect': 'http://172.16.249.159/index.html#/'}
-2024-11-07 10:51:11,488 asserts.py->__assert_equal line:21 [INFO]相等断言成功,预期：http://172.16.249.159/index.html#/,实际：http://172.16.249.159/index.html#/
-2024-11-07 10:51:12,687 conftest.py->test_collect line:34 [INFO]-------------------test end-------------------
+2024-12-04 14:59:10,203 conftest.py->test_collect line:31 [INFO]-------------------test start-------------------
+2024-12-04 14:59:10,208 conftest.py->test_collect line:32 [INFO]test data: {'username': 'root', 'password': '123', 'assert_type': 'in', 'expect': '密码错误'}
+2024-12-04 14:59:13,722 asserts.py->__assert_in line:59 [INFO]包含断言成功,预期：密码错误,实际：用户名或者密码错误.您还有4次机会
+2024-12-04 14:59:13,760 conftest.py->test_collect line:34 [INFO]-------------------test end-------------------
+2024-12-04 14:59:13,769 conftest.py->test_collect line:31 [INFO]-------------------test start-------------------
+2024-12-04 14:59:13,807 conftest.py->test_collect line:32 [INFO]test data: {'username': 'roo', 'password': 'jg123456', 'assert_type': 'in', 'expect': '密码错误'}
+2024-12-04 14:59:15,325 asserts.py->__assert_in line:59 [INFO]包含断言成功,预期：密码错误,实际：用户名或者密码错误.您还有3次机会
+2024-12-04 14:59:15,359 conftest.py->test_collect line:34 [INFO]-------------------test end-------------------
+2024-12-04 14:59:15,367 conftest.py->test_collect line:31 [INFO]-------------------test start-------------------
+2024-12-04 14:59:15,372 conftest.py->test_collect line:32 [INFO]test data: {'username': 777888456, 'password': None, 'assert_type': 'equal', 'expect': '用户名和密码不能为空'}
+2024-12-04 14:59:16,289 asserts.py->__assert_equal line:21 [INFO]相等断言成功,预期：用户名和密码不能为空,实际：用户名和密码不能为空
+2024-12-04 14:59:16,321 conftest.py->test_collect line:34 [INFO]-------------------test end-------------------
+2024-12-04 14:59:16,328 conftest.py->test_collect line:31 [INFO]-------------------test start-------------------
+2024-12-04 14:59:16,335 conftest.py->test_collect line:32 [INFO]test data: {'username': '777888456', 'password': '777888456', 'assert_type': 'equal', 'expect': 'http://172.16.249.159/index.html#/'}
+2024-12-04 14:59:18,483 asserts.py->__assert_equal line:21 [INFO]相等断言成功,预期：http://172.16.249.159/index.html#/,实际：http://172.16.249.159/index.html#/
+2024-12-04 14:59:18,570 conftest.py->test_collect line:34 [INFO]-------------------test end-------------------
+2024-12-04 14:59:18,575 conftest.py->test_collect line:31 [INFO]-------------------test start-------------------
+2024-12-04 14:59:18,580 conftest.py->test_collect line:32 [INFO]test data: {'username': '777888456', 'password': '777888456', 'assert_type': 'equal', 'expect': 'http://172.16.249.159/index.html#/'}
+2024-12-04 14:59:20,952 asserts.py->__assert_equal line:21 [INFO]相等断言成功,预期：http://172.16.249.159/index.html#/,实际：http://172.16.249.159/index.html#/
+2024-12-04 14:59:20,987 conftest.py->test_collect line:34 [INFO]-------------------test end-------------------
+2024-12-04 14:59:20,993 conftest.py->test_collect line:31 [INFO]-------------------test start-------------------
+2024-12-04 14:59:20,998 conftest.py->test_collect line:32 [INFO]test data: {'username': 'root', 'password': 'jg123456', 'assert_type': 'equal', 'expect': 'http://172.16.249.159/index.html#/'}
+2024-12-04 14:59:22,723 asserts.py->__assert_equal line:21 [INFO]相等断言成功,预期：http://172.16.249.159/index.html#/,实际：http://172.16.249.159/index.html#/
+2024-12-04 14:59:22,802 conftest.py->test_collect line:34 [INFO]-------------------test end-------------------

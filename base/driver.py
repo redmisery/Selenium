@@ -12,39 +12,48 @@ class Driver:
                  同时Selenium升级到4.26.1后，会自动获取最新驱动，无需手动更新，在此不使用本地chrome_driver_update包
                  首次启动时间较长，请耐心等待。
     """
-    instance = None
+    __instance = None
+    __inited = False
 
     def __new__(cls):
+        """
+        单例模式
+        """
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
 
-        driver_path = None
-        try:
-            if cls.instance is None:
-                cls.instance = super(Driver, cls).__new__(cls)
-                cls.instance.driver = Chrome()
-                driver_path = cls.instance.driver.service.path
+    def __init__(self):
+        if not self.__inited:
+            self.__inited = True
+            driver_path = None
+            try:
+                self.driver = Chrome()
+                driver_path = self.driver.service.path
                 # 驱动启动起始位置
-                cls.instance.driver.set_window_position(-8, 0, windowHandle='current')
+                self.driver.set_window_position(-8, 0, windowHandle='current')
                 # 驱动启动起始大小
-                cls.instance.driver.set_window_size(1920, 1080, windowHandle='current')
-                cls.instance.sessionManger = SessionManager(cls.instance.driver)
-            debug_log = f'驱动路径：{driver_path}！  Driver first created!'
-            LogUtils().debug(debug_log)
-            return cls.instance
-        except Exception as e:
-            error_log = f'驱动{driver_path}启动失败！{e} {traceback.format_exc()}'
-            LogUtils().error(error_log)
-            raise error_log
+                self.driver.set_window_size(1920, 1080, windowHandle='current')
+                # 实例化session管理器
+                self.sessionManger = SessionManager(self.driver)
+                debug_log = f'驱动路径：{driver_path}！  Driver first created!'
+                LogUtils().debug(debug_log)
+            except RuntimeError as e:
+                error_log = f'驱动{driver_path}启动失败！{e} {traceback.format_exc()}'
+                LogUtils().error(error_log)
+                raise RuntimeError(error_log)
 
 
     # 关闭driver
     @staticmethod
-    def close_driver():
+    def close_driver(self):
         try:
-            Driver.driver.quit()
+            self.driver.quit()
             debug_log = 'Driver closed'
             LogUtils().debug(debug_log)
-            Driver.driver = None  # 重置驱动实例
-            Driver.sessionManger = None  # 重置session管理实例
+            self.__instance = None  # 重置驱动实例
+            self.__inited = False  # 重置初始化状态
+            self.sessionManger = None  # 重置session管理实例
         except Exception as e:
             error_log = f'Driver close failed!{e} {traceback.format_exc()}'
             LogUtils().error(error_log)

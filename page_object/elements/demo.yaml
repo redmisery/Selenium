@@ -1,0 +1,17 @@
+login:
+  element:
+    username:
+      method: xpath
+      path: '//*[@id="login"]/div/span[1]/input'
+    password:
+      method: xpath
+      path: '//*[@id="login"]/div/span[2]/input'
+    confirm:
+      method: xpath
+      path: '//*[@id="login"]/div/button'
+
+index:
+  element:
+    supervise:
+      method: xpath
+      path: '//*[@id="app"]/div/div[2]/div[4]/div/div[1]'

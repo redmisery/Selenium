@@ -1,11 +1,12 @@
 from base import Driver
 from base.asserts import Asserts
 from common import PublicData
-from page_object.index import Index
+from page_object.operation.index import Index
 
 
 class TestLogin:
     index = Index()
+    driver = Driver().driver
     constant_data = PublicData.get_constant_data()
 
     def test_login(self, data):
@@ -18,7 +19,7 @@ class TestLogin:
         # 根据expect有不同的断言方式
         try:
             if 'http' in data['expect']:
-                result = self.index.driver.current_url
+                result = self.driver.current_url
             else:
                 result = self.index.get_login_tip()
             Asserts.asserts(data['assert_type'], result, data['expect'])

@@ -1,8 +1,7 @@
-from base import Driver
+import inspect
 
-# a = Driver().instance.sessionManger
-# b = Driver.instance.sessionManger
-# print(a)
-# print(b)
 
-a = Driver()
+class A:
+    def __init__(self):
+        caller_file = inspect.stack()[1].filename
+        print(caller_file)

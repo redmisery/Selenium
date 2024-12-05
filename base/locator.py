@@ -1,10 +1,11 @@
 from selenium.common import NoSuchFrameException
-from selenium.webdriver import Keys
+from selenium.webdriver import Keys, ActionChains
 from selenium.webdriver.chrome.webdriver import WebDriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
+from base import Driver
+from base.element import Element
 from common import LogUtils
 
 
@@ -35,86 +36,107 @@ class SwitchFrame:
 class Locator:
     """
     元素定位器
-    :param driver: WebDriver
-    :param element: 元素定位信息
+    :param element: 元素
     :return:
     """
 
-    def __init__(self, driver: WebDriver, element: dict = None):
-        self.driver = driver
+    def __init__(self, element: Element = None):
+        self.driver = Driver().driver
+        self.element = element
+        self.web_element = None
+        # 隐式等待
+        self.driver.implicitly_wait(10)
+        # 显式等待
+        wait = WebDriverWait(self.driver, 10)
         if element:
-            self.method, self.path = next(iter(element.items()))
-            # 设定等待时长
-            self.driver.implicitly_wait(10)
-            wait = WebDriverWait(self.driver, 10)
-            # 定位方法验证
-            if self.method in ['css', 'xpath']:
-                try:
-                    # 获取元素
-                    web_element = None
-                    if self.method == 'css':
-                        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, self.path)))
-                        web_element = self.driver.find_element(By.CSS_SELECTOR, self.path)
-                    if self.method == 'xpath':
-                        wait.until(EC.presence_of_element_located((By.XPATH, self.path)))
-                        web_element = self.driver.find_element(By.XPATH, self.path)
-                    wait.until(EC.visibility_of(web_element))
-                    self.element = web_element
-                    debug_log = f'{self.path}通过{self.method}定位成功！'
-                    LogUtils().debug(debug_log)
-                except Exception as e:
-                    error_log = f'{self.path}通过{self.method}定位失败！{e}'
-                    LogUtils().error(error_log)
-                    raise Exception(error_log)
-            else:
-                error_log = f'{self.path}定位方法{self.method}不支持！'
+            try:
+                self.web_element = wait.until(EC.presence_of_element_located((element.method, element.path)))
+            except Exception as e:
+                error_log = f'{element.path}元素定位失败！{e}'
                 LogUtils().error(error_log)
                 raise Exception(error_log)
 
-    # 点击操作
     def click(self):
+        """
+        单击操作
+        """
         try:
-            self.element.click()
-            debug_log = f'{self.path}点击！'
+            self.web_element.click()
+            debug_log = f'{self.element.path}元素点击！'
             LogUtils().debug(debug_log)
         except Exception as e:
-            error_log = f'{self.path}点击失败！{e}'
+            error_log = f'{self.element.path}点击失败！{e}'
             LogUtils().error(error_log)
             raise Exception(error_log)
 
-    # 输入操作
-    def send_keys(self, text):
+    def double_click(self):
+        """
+        双击操作
+        """
+        try:
+            actions = ActionChains(self.driver)
+            actions.double_click(self.web_element).perform()
+            debug_log = f'{self.element.path}元素双击！'
+            LogUtils().debug(debug_log)
+        except Exception as e:
+            error_log = f'{self.element.path}双击失败！{e}'
+            LogUtils().error(error_log)
+            raise Exception(error_log)
+
+    def input(self, text):
+        """
+        输入操作
+        """
         try:
             if text:
                 # clear()函数不起作用，使用全选输入
-                self.element.send_keys(Keys.CONTROL, 'a')
-                self.element.send_keys(text)
-                debug_log = f'{self.path}输入{text}！'
+                self.web_element.send_keys(Keys.CONTROL, 'a')
+                self.web_element.send_keys(text)
+                debug_log = f'{self.element.path}输入{text}！'
                 LogUtils().debug(debug_log)
         except Exception as e:
-            error_log = f'{self.path}输入{text}失败！{e}'
+            error_log = f'{self.element.path}输入{text}失败！{e}'
             LogUtils().error(error_log)
             raise Exception(error_log)
 
-    # 获取文本
     def get_text(self):
+        """
+        获取文本
+        """
         try:
-            text = self.element.text
-            debug_log = f'{self.path}获取文本{text}！'
+            # 通过js获取文本，可以解决部分元素获取文本为空的问题，原因是元素被隐藏或不可见
+            text = self.driver.execute_script("return arguments[0].innerText", self.web_element)
+            debug_log = f'{self.element.path}获取文本{text}！'
             LogUtils().debug(debug_log)
             return text
         except Exception as e:
-            error_log = f'{self.path}获取文本失败！{e}'
+            error_log = f'{self.element.path}获取文本失败！{e}'
             LogUtils().error(error_log)
             raise
 
-    # 跳转网页
     def goto(self, url):
+        """
+        跳转url
+        """
         try:
             self.driver.get(url)
             debug_log = f'跳转到{url}！'
             LogUtils().debug(debug_log)
         except Exception as e:
             error_log = f'跳转到{url}失败！{e}'
+            LogUtils().error(error_log)
+            raise Exception(error_log)
+
+    def hover(self):
+        """
+        鼠标悬停操作
+        """
+        try:
+            actions = ActionChains(self.driver)
+            actions.move_to_element(self.web_element).perform()
+            debug_log = f'{self.element.path}元素悬停！'
+            LogUtils().debug(debug_log)
+        except Exception as e:
+            error_log = f'{self.element.path}悬停失败！{e}'
             LogUtils().error(error_log)
             raise Exception(error_log)

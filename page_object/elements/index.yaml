@@ -1,0 +1,13 @@
+index:
+  user_text: # 用户名输入框
+    method: xpath
+    path: '//*[@id="login"]/div/span[1]/input'
+  password_text: # 密码输入框
+    method: css
+    path: '#login > div > span.ant-input-affix-wrapper.ant-input-password.input___3_OCv > input'
+  confirm_button: # 确认按钮
+    method: css
+    path: '#login > div > button'
+  login_tip: # 登录提示
+    method: xpath
+    path: "//div[contains(@class,'ant-message-custom-content')]/span[2]"
