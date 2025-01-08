@@ -24,7 +24,7 @@ class MysqlConnector:
                 self.connection = connection
         except Error as e:
             error_log = f'Error connecting to MySQL:{e} {traceback.format_exc()}'
-            LogUtils().error(error_log)
+            LogUtils().errors(error_log)
             raise Exception(error_log)
 
     # 根据测试函数名查询测试数据表，若不存在则报错
@@ -46,10 +46,10 @@ class MysqlConnector:
                     return data
                 else:
                     error_log = f'{table_name} data is empty'
-                    LogUtils().error(error_log)
+                    LogUtils().errors(error_log)
         except Error as e:
             error_log = f'Error getting {table_name} data:{e} {traceback.format_exc()}'
-            LogUtils().error(error_log)
+            LogUtils().errors(error_log)
             raise Exception(error_log)
 
     # 关闭数据库

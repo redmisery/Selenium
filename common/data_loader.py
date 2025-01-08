@@ -1,11 +1,13 @@
+import os
 import traceback
 from pathlib import Path
+from typing import Union, Optional
 
 import pandas
 from pandas import DataFrame
 from ruamel.yaml import YAML
 
-from common import Config, LogUtils
+from common import LogUtils
 
 
 class Excel:
@@ -17,25 +19,36 @@ class Excel:
         if path.exists():
             self.path = path
         else:
+            self.path = None
             error_log = f"{path} Excel file does not exist"
-            LogUtils().error(error_log)
-            raise error_log
+            LogUtils().errors(error_log)
 
-    def read(self, sheet=0) -> list:
+    def read(self, sheet: Union[str, int, None] = 0) -> Optional[list[dict]]:
         """
         读取excel表
         :param sheet: sheet_name
         :return: dict
         """
-        df = DataFrame(pandas.read_excel(self.path, sheet_name=sheet))
+        if sheet is None or self.path is None:
+            debug_info = f"Read {self.path} file failed, sheet or path is None"
+            LogUtils().debug(debug_info)
+            return None
+
+        try:
+            df = DataFrame(pandas.read_excel(self.path, sheet_name=sheet))
+        except Exception as e:
+            error_log = f"Read {self.path}.{sheet} file failed,reason:{e},{traceback.format_exc()}"
+            LogUtils().errors(error_log)
+            return None
         # 判断excel表是否为空或数据为空
         if df.empty or df.isnull().all().all():
             error_log = f"{self.path} Excel file is empty"
-            LogUtils().error(error_log)
-            raise ValueError(error_log)
+            LogUtils().errors(error_log)
+            return None
         else:
-            data = df.applymap(lambda x: None if pandas.isna(x) else x).to_dict(orient='records')
-            debug_log = "Read Excel file successfully"
+            # 转换为字典，并将空值替换为None
+            data = df.where(pandas.notna(df), None).to_dict(orient='records')
+            debug_log = f"Read {self.path} file successfully"
             LogUtils().debug(debug_log)
             return data
 
@@ -45,7 +58,6 @@ class PublicData:
     公共变量
     """
     yaml = YAML()
-    public_data_path = Config().public_data_path
 
     @staticmethod
     def get(key, is_clear=False):
@@ -55,7 +67,7 @@ class PublicData:
         :param is_clear: 是否清除{key: value}
         :return: value
         """
-        with open(PublicData.public_data_path, encoding='utf-8', mode='r') as f:
+        with open(os.getenv("PUBLIC_DATA_PATH"), encoding='utf-8', mode='r') as f:
             try:
                 data = PublicData.yaml.load(f)
                 value = data[key]
@@ -70,7 +82,7 @@ class PublicData:
                 return value
             except Exception as e:
                 error_log = f'get key: {key} error,reason:{e},{traceback.format_exc()}'
-                LogUtils().error(error_log)
+                LogUtils().errors(error_log)
 
     @staticmethod
     def put(key, value):
@@ -80,7 +92,7 @@ class PublicData:
         :param value:
         :return: 无
         """
-        with open(PublicData.public_data_path, encoding='utf-8', mode='r+') as f:
+        with open(os.getenv("PUBLIC_DATA_PATH"), encoding='utf-8', mode='r+') as f:
             try:
                 data = PublicData.yaml.load(f)
                 if data is None:
@@ -94,7 +106,7 @@ class PublicData:
                 LogUtils().debug(debug_log)
             except Exception as e:
                 error_log = f'put key: {key},value: {value} error,reason:{e},{traceback.format_exc()}'
-                LogUtils().error(error_log)
+                LogUtils().errors(error_log)
 
     @staticmethod
     def get_constant_data():
@@ -105,7 +117,7 @@ class PublicData:
         return PublicData.get('constant')
 
 
-def DataParse(data: list) -> list:
+def data_parse(data: list) -> list:
     """
     解析字符串的{{key}}全局变量并根据value从data/constant_data.yaml获取value，替换{{key}}
     """
@@ -118,9 +130,7 @@ def DataParse(data: list) -> list:
                     try:
                         value = value.replace(f"{{{{{k}}}}}", v)
                         i[key] = value
-                        debug_log = f"{value} replace {k} to {v}"
-                        LogUtils().debug(debug_log)
                     except Exception as e:
-                        error_log = f'replace {k} to {v} faild!:{e}:{traceback.format_exc()}'
-                        LogUtils().error(error_log)
+                        error_log = f'replace {k} to {v} failed!:{e}:{traceback.format_exc()}'
+                        LogUtils().errors(error_log)
     return data

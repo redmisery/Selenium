@@ -1,59 +1,14 @@
 homepage:
-  software:
-    software_name: # 平台名称
-      method: xpath
-      path: "#root > div > div.container___2L9JH.theme0___11dSN > div.titlebar___GyWMy > div.title___2Meyb > span"
-    software_name_pop: # 平台名称弹窗
-      method: xpath
-      path: "/html/body/div[2]/div/div[2]/div/div[2]/div/div/div[1]/span[2]"
-    software_name_input: #平台名称弹窗->输入
-      method: xpath
-      path: "/html/body/div[2]/div/div[2]/div/div[2]/div/div/div[1]/div/input"
-    software_name_confirm: #平台名称弹窗->确定
-      method: xpath
-      path: "/html/body/div[2]/div/div[2]/div/div[2]/div/div/div[2]/button[2]/span"
-    software_name_cancel: #平台名称弹窗->取消
-      method: xpath
-      path: "/html/body/div[2]/div/div[2]/div/div[2]/div/div/div[2]/button[1]/span"
-
-  user:
-    user: # 用户
-      method: xpath
-      path: '//*[@id="root"]/div/div[1]/div[1]/div[2]/div[3]/h5'
-    modify_password: # 修改密码
-      method: xpath
-      path: '//html/body/div[3]/div/div/ul/li[1]/span/span[2]'
-    old_password_input: # 旧密码输入框
-      method: xpath
-      path: '/html/body/div[3]/div/div[2]/div/div[2]/div[2]/div[1]/div/span/input'
-    new_password_input: # 新密码输入框
-      method: xpath
-      path: '/html/body/div[3]/div/div[2]/div/div[2]/div[2]/div[2]/div/span'
-    confirm_password_input: # 确认密码输入框
-      method: xpath
-      path: '/html/body/div[3]/div/div[2]/div/div[2]/div[2]/div[4]/div/span'
-    modify_password_confirm: # 修改密码确定按钮
-      method: xpath
-      path: '/html/body/div[3]/div/div[2]/div/div[2]/div[3]/button[2]/span'
-    modify_password_cancel: # 修改密码取消按钮
-      method: xpath
-      path: '/html/body/div[3]/div/div[2]/div/div[2]/div[2]/div[4]/div/span'
-    pop_tips: # 密码弹窗提示
-      method: xpath
-      path: '/html/body/div[4]/div/div/div/div/div/span[2]'
-    password_format_tips: # 密码格式提示
-      method: xpath
-      path: '/html/body/div[3]/div/div[2]/div/div[2]/div[2]/div[3]/div/div/span'
-    logout: # 退出登录
-      method: xpath
-      path: '/html/body/div[2]/div/div/ul/li[3]/span/span[2]'
-
-  version_information: # 版本信息
+  frame: # 首页iframe
     method: xpath
-    path: '//*[@id="root"]/div/div[3]/div[3]/label[2]/span[2]'
-    version_number: # 版本型号
+    path: '//*[@id="common_frame"]/div/iframe'
+  map_layer: # 图层
+    load_tip: # 加载提示
       method: xpath
-      path: '/html/body/div[3]/div/div[2]/div/div[2]/div[2]/div/p[3]/text()'
-  setting: # 设置
-    method: xpath
-    path: '//*[@id="root"]/div/div[1]/div[1]/div[2]/div[2]/span/svg'
+      path: '//*[@id="root"]/div/div[1]/div/div[2]'
+    first_layer: # 第一个图层
+      method: xpath
+      path: '//*[@id="root"]/div/div[3]/div[1]/span'
+    other_layers: # 其他图层
+      method: xpath
+      path: '//*[@id="root"]/div/div[3]/div[1]/div/div/div/ul/li'

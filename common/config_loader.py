@@ -1,33 +1,21 @@
-from pathlib import Path
-
-from ruamel.yaml import YAML
-
-yaml = YAML()
+import configparser
+import os
 
 
 class Config:
-    """
-    路径、项目管理工具类
-    """
-
-    @property
-    def project_path(self) -> Path:
-        return Path(__file__).resolve().parents[1]
-
-    @property
-    def config_path(self) -> Path:
-        return self.project_path / 'config' / 'config.yaml'
-
-    @property
-    def data_path(self) -> Path:
-        with open(self.config_path, 'r', encoding='utf-8') as f:
-            config = yaml.load(f)
-            data_path = self.project_path / config['data']['data_path']
-            return data_path
-
-    @property
-    def public_data_path(self) -> Path:
-        with open(self.config_path, 'r', encoding='utf-8') as f:
-            config = yaml.load(f)
-            public_data_path = self.project_path / config['data']['public_data_path']
-            return public_data_path
+    @staticmethod
+    def log_config(key):
+        """
+        获取日志配置,加入${}扩展替换为环境变量值
+        :param key: 配置项
+        :return: 配置值
+        """
+        output = None
+        config_path = os.getenv("CONFIG_PATH")
+        if config_path:
+            config = configparser.ConfigParser()
+            config.read(config_path)
+            if key and config.has_option("log", key):
+                config["log"][key] = os.path.expandvars(config["log"][key])
+                output = config["log"][key]
+        return output

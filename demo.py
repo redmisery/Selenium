@@ -1,7 +1,7 @@
-import inspect
+from dotenv import load_dotenv
 
+from base import Driver
 
-class A:
-    def __init__(self):
-        caller_file = inspect.stack()[1].filename
-        print(caller_file)
+load_dotenv("env/.env")
+load_dotenv("env/se-config.env")
+Driver()

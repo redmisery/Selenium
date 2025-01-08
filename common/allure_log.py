@@ -1,5 +1,6 @@
 import json
 import traceback
+
 import allure
 
 from common.log import LogUtils
@@ -61,9 +62,9 @@ class AllureLog:
             allure.attach(body=request_data, name="请求完整参数", attachment_type=allure.attachment_type.TEXT)
 
             # -------------------日志报告------------------
-            LogUtils().info("请求接口:" + url)
-            LogUtils().info("请求数据：\n" + data)
-            LogUtils().info("响应状态码:" + response_status_code)
-            LogUtils().info("响应结果：\n" + response_data)
+            LogUtils().infos("请求接口:" + url)
+            LogUtils().infos("请求数据：\n" + data)
+            LogUtils().infos("响应状态码:" + response_status_code)
+            LogUtils().infos("响应结果：\n" + response_data)
         except KeyError:
-            LogUtils().error("allure log日志打印异常：%s" % traceback)
+            LogUtils().errors("allure log日志打印异常：%s" % traceback)

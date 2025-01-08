@@ -1,91 +1,43 @@
-from base import Locator
-from base.element import Page
+from base import Page, Locator
+from common import LogUtils, singleton
 
 
+@singleton
 class HomePage:
+    """
+    首页
+    """
     def __init__(self):
-        # 首页
         self.page = Page().load()
+        self.locator = Locator()
 
-    def get_version_info(self) -> str:
-        """
-        获取版本信息
-        :return: 版本信息
-        """
-        page = self.page
-        Locator(page.version_information).click()
-        return Locator(page.version_number).get_text()
+    def go_main(self):
+        self.locator.goto('/index.html#/svmsweb_jg/bdms/map')
+        # 开始切换内部iframe，并统一使用定位器
+        self.locator.switch_frame(self.page.frame)
 
-    def open_settings(self):
-        """
-        打开设置页面
-        """
-        Locator(self.page.settings).click()
+    # 切换图层
+    def switch_layer(self, layer_name):
+        self.locator.load_element(self.page.map_layer.first_layer)
+        if self.locator.get_text() != layer_name:
+            self.locator.hover()
+            web_elements = self.locator.load_elements(self.page.map_layer.other_layers).web_elements
+            flag = False
+            for index, web_element in enumerate(web_elements):
+                self.locator.path = self.page.map_layer.other_layers.path + f'[{index}]'
+                self.locator.web_element = web_element
+                if self.locator.get_text() == layer_name:
+                    self.locator.click()
+                    flag = True
+                    break
+            if not flag:
+                error_log = f"切换图层失败，图层名称：{layer_name} 不存在"
+                LogUtils().errors(error_log)
+        else:
+            debug_info = f"当前图层已是：{layer_name}"
+            LogUtils().debug(debug_info)
 
-    class SoftwareName:
-        def __init__(self):
-            # software模块
-            self.page = Page().load().software
-
-        def modify_software_name(self, new_name):
-            """
-            修改平台名称
-            :param new_name:新平台名称
-            """
-            page = self.page
-            Locator(page.software_name).double_click()
-            Locator(page.software_name_input).input(new_name)
-            Locator(page.software_name_confirm).click()
-
-        def get_software_name(self) -> str:
-            """
-            获取平台名称
-            :return: 平台名称
-            """
-            page = self.page
-            return Locator(page.software_name).get_text()
-
-        def restore_software_name(self):
-            """
-            还原平台名称
-            """
-            original_name = "视频轨迹跟踪平台软件"
-            self.modify_software_name(original_name)
-
-    class User:
-        def __init__(self):
-            # 用户模块
-            self.page = Page().load().user
-
-        def change_password(self, old_password, new_password):
-            """
-            修改密码
-            :param old_password: 旧密码
-            :param new_password: 新密码
-            """
-            Locator(self.page.user).hover()
-            Locator(self.page.modify_password).click()
-            Locator(self.page.old_password_input).input(old_password)
-            Locator(self.page.new_password_input).input(new_password)
-            Locator(self.page.confirm_password_input).input(new_password)
-            Locator(self.page.confirm_password_change).click()
-
-        def get_password_tip(self) -> str:
-            """
-            获取密码弹窗提示信息
-            :return: 密码弹窗提示信息
-            """
-            return Locator(self.page.pop_tips).get_text()
-
-        def get_password_format_tip(self) -> str:
-            """
-            获取密码格式提示
-            :return: 密码格式提示
-            """
-            return Locator(self.page.password_format_tip).get_text()
-
-        def logout(self):
-            """
-            退出登录
-            """
-            Locator(self.page.logout).click()
+    # 获取当前图层名称
+    def get_current_layer(self):
+        layer_name = self.locator.load_element(self.page.map_layer.first_layer).get_text()
+        return layer_name
