@@ -1,12 +1,9 @@
 from pathlib import Path
 
-from dotenv import dotenv_values
+from dotenv import dotenv_values, load_dotenv
 
-from common import LogUtils
+from common.log import LogUtils
 
-"""
-由pytest-dotenv自动执行加载，无需显式加载环境变量
-"""
 
 
 class Env:
@@ -61,6 +58,9 @@ class Env:
             for k, v in self.__env_data.items():
                 if k not in env_data or env_data[k] != v:
                     self.write_env(**{k: v})
+            # 开始加载环境变量
+            load_dotenv(self.env_path)
+            load_dotenv(r'C:\Users\hanyan\PycharmProjects\Selenium\env\se-config.env')
             debug_info = f'检查环境变量完成!'
             LogUtils().debug(debug_info)
         except Exception as e:

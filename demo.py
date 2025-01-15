@@ -1,7 +1,4 @@
-from dotenv import load_dotenv
+from pathlib import Path
 
-from base import Driver
-
-load_dotenv("env/.env")
-load_dotenv("env/se-config.env")
-Driver()
+a=Path(__file__)/None
+print(a)

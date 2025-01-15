@@ -7,7 +7,7 @@ import pandas
 from pandas import DataFrame
 from ruamel.yaml import YAML
 
-from common import LogUtils
+from common.log import LogUtils
 
 
 class Excel:

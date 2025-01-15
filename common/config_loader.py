@@ -1,5 +1,8 @@
 import configparser
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 
 class Config:
@@ -19,3 +22,17 @@ class Config:
                 config["log"][key] = os.path.expandvars(config["log"][key])
                 output = config["log"][key]
         return output
+
+    @staticmethod
+    def dependency_config():
+        """
+        获取依赖配置
+        """
+        from ruamel.yaml import YAML
+        yaml = YAML()
+        dependency_path = Path(os.getenv("DEPENDENCY_PATH"))
+        if dependency_path.exists():
+            with dependency_path.open("r") as f:
+                return yaml.load(f)
+        else:
+            return {}

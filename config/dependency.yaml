@@ -1,0 +1,10 @@
+test_login.py:
+  TestLogin:
+    test_login:
+      name: login
+      scope: session
+      depends:
+    test_login1:
+      name: login1
+      scope: session
+      depends: [ login ]
