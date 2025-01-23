@@ -1,3 +1,4 @@
+from typing import Literal
 from base import Page, Locator
 from common import LogUtils, singleton
 
@@ -7,9 +8,12 @@ class HomePage:
     """
     首页
     """
+
     def __init__(self):
         self.page = Page().load()
         self.locator = Locator()
+        # 进入时默认切换到对应模块
+        # Foundation().switch_module('首页')
 
     def go_main(self):
         self.locator.goto('/index.html#/svmsweb_jg/bdms/map')
@@ -41,3 +45,21 @@ class HomePage:
     def get_current_layer(self):
         layer_name = self.locator.load_element(self.page.map_layer.first_layer).get_text()
         return layer_name
+
+    # 查看历史轨迹
+    def view_history_track(self, person_name, person_location: Literal['在区', '出区'], person_type: Literal['民警', '嫌疑人', '其他'] = None):
+        self.locator.load_element(self.page.track_mode.history).click()
+        self.locator.load_element(self.page.track_mode.history.search_input).send_keys(person_name)
+        if person_location == '在区':
+            self.locator.load_element(self.page.track_mode.history.person_location.in_area).click()
+        if person_location == '出区':
+            self.locator.load_element(self.page.track_mode.history.person_location.out_area).click()
+        if person_type:
+            type_dict = {'民警': 'police', '嫌疑人': 'suspect', '其他': 'others'}
+            self.locator.load_element(self.page.track_person.history.person_type + type_dict[person_type]).click()
+        self.locator.load_element(self.page.track_person.history.search).click()
+        self.locator.load_elements()
+
+    # 实时跟踪
+    def real_track(self, person_name, person_type: Literal['民警', '嫌疑人', '其他'] = None):
+        self.locator.load_element(self.page.track_mode.real_time).click()

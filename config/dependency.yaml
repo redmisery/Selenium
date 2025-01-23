@@ -4,7 +4,10 @@ test_login.py:
       name: login
       scope: session
       depends:
-    test_login1:
-      name: login1
+
+test_home_page.py:
+  TestHomePage:
+    test_switch_layer:
+      name: switch_layer
       scope: session
       depends: [ login ]

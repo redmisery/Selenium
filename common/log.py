@@ -21,12 +21,18 @@ class LogConfig:
         :param key: 日志配置项
         :return: 日志配置值
         """
-        config = configparser.ConfigParser(interpolation=None)
-        config.read(LogConfig.log_config_path)
-        if key:
-            return config.get('log', key)
+        if LogConfig.log_config_path.exists():
+            try:
+                config = configparser.ConfigParser(interpolation=None)
+                config.read(LogConfig.log_config_path)
+                if key:
+                    return config.get('log', key)
+                else:
+                    return config['log']
+            except (configparser.NoSectionError, configparser.NoOptionError) as e:
+                raise f'读取配置失败，原因：{e}'
         else:
-            return config['log']
+            raise FileNotFoundError(f"日志配置文件不存在:{LogConfig.log_config_path}")
 
 
 class LogUtils(Logger):

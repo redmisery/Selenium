@@ -9,6 +9,84 @@ homepage:
     first_layer: # 第一个图层
       method: xpath
       path: '//*[@id="root"]/div/div[3]/div[1]/span'
-    other_layers: # 其他图层
+    other_layers: # 其他图层(多个)
       method: xpath
       path: '//*[@id="root"]/div/div[3]/div[1]/div/div/div/ul/li'
+  track_mode: # 轨迹模式
+    real_time: # 实时
+      method: xpath
+      path: '//*[@id="root"]/div/div[3]/div[3]/label[1]/span[2]'
+    history: # 历史
+      method: xpath
+      path: '//*[@id="root"]/div/div[3]/div[3]/label[2]/span[2]'
+      person_location: # 人员位置
+        in_area: # 在区人员
+          method: xpath
+          path: '//*[@id="root"]/div/div[3]/div/div/div[1]/div/div/div/label[1]/span[2]'
+        out_area: # 出区人员
+          method: xpath
+          path: '//*[@id="root"]/div/div[3]/div/div/div[1]/div/div/div/label[2]/span[2]'
+      person_type: # 人员类型
+        method: xpath
+        path: '//*[@id="root"]/div/div[3]/div/div/div[1]/div/div/div/label[1]/span[1]'
+        police: #民警
+          method: xpath
+          path: '//*[@id="7c6b0f4d-1348-4a5a-c49f-8774e78b2398"]/ul/li[1]'
+        suspect: #嫌疑人
+          method: xpath
+          path: '//*[@id="7c6b0f4d-1348-4a5a-c49f-8774e78b2398"]/ul/li[2]'
+        others: #其他
+          method: xpath
+          path: '//*[@id="7c6b0f4d-1348-4a5a-c49f-8774e78b2398"]/ul/li[3]'
+      search_input: # 搜索输入框
+        method: xpath
+        path: '//*[@id="root"]/div/div[3]/div/div/div[2]/div[1]/span/span/span[1]/input'
+      search: # 搜索
+        method: xpath
+        path: '//*[@id="root"]/div/div[3]/div/div/div[2]/div[1]/span/span/span[2]/button'
+      search_result: # 搜索结果(多个)
+        method: xpath
+        path: '//*[@id="root"]/div/div[3]/div/div/div[2]/div[2]/div/div/div/ul/li'
+        person: # 搜索的人员
+          view: # 查看(后缀元素，search_result.person.path[1]+view.path)
+            method: xpath
+            path: '/ul/li/a'
+          tracks: # 轨迹(多个)
+            method: xpath
+            path: '//*[@id="root"]/div/div[3]/div[2]/div/div/div[2]/div/div/div/div/div/div/div/table/tbody/tr'
+      pages: # 页数：上一页，1，2，3，4，5，下一页
+        method: xpath
+        path: '/html/body/div/div/div[3]/div/div/div[2]/ul/li'
+    person_distribute: # 人员分布:
+      method: xpath
+      path: '//*[@id="root"]/div/div[2]/div[1]'
+      person_type: # 人员类型
+        method: xpath
+        path: '//*[@id="root"]/div/div[2]/div[1]/div/div/div/label[1]/span[1]'
+        police: #民警
+          method: xpath
+          path: '//*[@id="7c6b0f4d-1348-4a5a-c49f-8774e78b2398"]/ul/li[1]'
+        suspect: #嫌疑人
+          method: xpath
+          path: '//*[@id="7c6b0f4d-1348-4a5a-c49f-8774e78b2398"]/ul/li[2]'
+        others: #其他
+          method: xpath
+          path: '//*[@id="7c6b0f4d-1348-4a5a-c49f-8774e78b2398"]/ul/li[3]'
+      person: # 人员(多个)
+        method: xpath
+        path: '//*[@id="root"]/div/div[2]/div[3]/div/div/div/div[2]/div/div[2]/div/div[2]/div/div/ul/li'
+        trace: # 跟踪(后缀元素，person.path[1]+trace.path)
+          method: xpath
+          path: '/ul/li/a'
+    device_list: # 设备列表(多个)
+      method: xpath
+      path: '//*[@id="root"]/div/div[2]/div[2]'
+      monitor: # 监控
+        method: xpath
+        path: '//*[@id="root"]/div/div[2]/div[3]/div/div/div/div[2]/div/div[2]/div/div/div/div[1]'
+        device: # 设备(多个)
+          method: xpath
+          path: '//*[@id="root"]/div/div[2]/div[3]/div/div/div/div[2]/div/div[2]/div/div/div/div[2]/div/div/div/div/div/ul/li'
+          view: # 查看(后缀元素，device.path[1]+view.path)
+            method: xpath
+            path: '/ul/li/a'

@@ -1,5 +1,5 @@
 from common.config_loader import Config
-from common.data_loader import Excel, PublicData, data_parse
+from common.data_loader import Excel, PublicData
 from common.env_loader import Env
 from common.fixture import singleton
 from common.log import LogUtils

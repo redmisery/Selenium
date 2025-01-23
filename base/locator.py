@@ -48,7 +48,7 @@ class Locator:
     :return:
     """
 
-    def __init__(self, element: Element = None):
+    def __init__(self, element: Element = None, appendix_element: Element = None):
         """
         初始化
         :param element: 元素
@@ -64,6 +64,9 @@ class Locator:
         # 显式等待
         self.wait = WebDriverWait(self.driver, 10)
         if element:
+            # 若存在appendix_element，则合并path
+            if appendix_element and element.method == appendix_element.method:
+                element.path = element.path + appendix_element.path
             self.load_element(element)
 
     def load_element(self, element: Element):
@@ -104,8 +107,8 @@ class Locator:
         """
         try:
             self.driver.switch_to.frame(self.load_element(element).web_element)
-            info_log = f'切换Frame{self.path}成功！'
-            LogUtils().infos(info_log)
+            debug_log = f'切换Frame{self.path}成功！'
+            LogUtils().debug(debug_log)
         except NoSuchFrameException as e:
             error_log = f'{self.path} frame not found!{e} '
             LogUtils().errors(error_log)
@@ -197,7 +200,7 @@ class Locator:
             LogUtils().errors(error_log)
             raise Exception(error_log)
 
-    def hover(self, hover_time: Union[int, None] = 3):
+    def hover(self, hover_time: Union[int, None] = 1):
         """
         鼠标悬停操作，默认3秒
         """

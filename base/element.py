@@ -62,6 +62,7 @@ class Page:
             LogUtils().errors(error_log)
             raise Exception(error_log)
 
+
     def load(self):
         """
         加载yaml文件中的元素信息，并返回所有元素对象。
@@ -69,23 +70,39 @@ class Page:
         # 默认不要第一层的模块名，只保留元素，不能直接使用data.values()，否则返回一个CommentedMapView视图对象
         yaml_data: CommentedMap = iter(self.data.values()).__next__()
 
-        # 使用递归函数根据yaml结构创建page对象
-        def create_page(data, parent) -> object:
+        # 阶段1：创建所有对象
+        def create_page_stage1(data, parent, parent_path="") -> object:
             for key, value in data.items():
-                if isinstance(value, dict) and ('method' or 'path') in value:
-                    # 创建元素
-                    element = Element(value['method'], value['path'])
-                    setattr(parent, key, element)
-                else:
-                    # 创建模块
-                    module = type(key, (object,), {})()
-                    create_page(value, module)
-                    setattr(parent, key, module)
+                current_path = f"{parent_path}.{key}" if parent_path else key
+                if isinstance(value, dict):
+                    # 修复逻辑：判断当前层级是否直接定义 method 和 path
+                    is_element = 'method' in value.keys() and 'path' in value.keys()
+
+                    if is_element:
+                        # 创建元素对象
+                        try:
+                            element = Element(value['method'], value['path'])
+                            setattr(parent, key, element)
+                        except KeyError as e:
+                            error_log = f"元素配置错误: {key} {value} {e}"
+                            LogUtils().errors(error_log)
+                            raise KeyError(error_log)
+                        # 递归处理子元素（支持元素嵌套子元素）
+                        create_page_stage1(value, element, current_path)
+                    else:
+                        # 创建模块对象
+                        module = type(key, (object,), {})()
+                        setattr(parent, key, module)
+                        create_page_stage1(value, module, current_path)
             return parent
 
-        print(yaml_data)
-        self.page = create_page(yaml_data, type('Page', (object,), {})())
-        return self.page
+        # 执行加载
+        try:
+            self.page = create_page_stage1(yaml_data, type('Page', (object,), {})())
+            return self.page
+        except Exception as e:
+            LogUtils().errors(f"加载页面对象失败: {str(e)}")
+            raise
 
     def __getattr__(self, item):
         # 增加链式访问

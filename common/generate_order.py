@@ -1,8 +1,10 @@
 from dotenv import load_dotenv
-
+from bidict import bidict
+from dataclasses import dataclass
 from common import LogUtils
 from common.config_loader import Config
 from collections import defaultdict, deque
+
 
 def build_dependency_graph(dependencies):
     """构建依赖图"""
@@ -18,6 +20,10 @@ def build_dependency_graph(dependencies):
             for test_name, test_info in tests.items():
                 fullpath = f"{module}::{class_name}::{test_name}"
                 name = test_info.get('name') or fullpath
+                if name in name_to_fullpath:
+                    error_log = ValueError(f"测试用例名称重复,请修改name属性,name:{name}, fullpath:{fullpath}")
+                    LogUtils().errors(error_log)
+                    raise error_log
                 name_to_fullpath[name] = fullpath
                 fullpath_to_name[fullpath] = name
                 all_fullpaths.add(fullpath)
@@ -40,6 +46,7 @@ def build_dependency_graph(dependencies):
             in_degree[node] = 0
 
     return graph, in_degree, name_to_fullpath, all_fullpaths
+
 
 def detect_cycle(graph):
     """检测依赖图中是否存在环，并返回环的路径"""
@@ -72,6 +79,7 @@ def detect_cycle(graph):
 
     return None
 
+
 def topological_sort(graph, in_degree):
     """拓扑排序，同时检测环"""
     queue = deque([node for node, degree in in_degree.items() if degree == 0])
@@ -92,8 +100,19 @@ def topological_sort(graph, in_degree):
 
     return sorted_order
 
-def generate_execution_order():
-    """生成执行顺序"""
+
+@dataclass
+class Result:
+    order: bidict
+    name_to_fullpath: dict
+
+
+def generate_execution_order() -> Result:
+    """
+    生成执行顺序
+    :return: execution_order: 字典，key为测试用例全路径，value为数字顺序
+    :return: name_to_fullpath: 字典，key为测试用例名称，value为测试用例全路径
+    """
     dependencies = Config.dependency_config()
 
     graph, in_degree, name_to_fullpath, all_fullpaths = build_dependency_graph(dependencies)
@@ -109,7 +128,7 @@ def generate_execution_order():
     sorted_names = topological_sort(graph, in_degree)
 
     # 分配数字顺序
-    execution_order = {}
+    execution_order = bidict()
     # 有依赖的测试用例分配1到N
     for idx, name in enumerate(sorted_names, start=1):
         try:
@@ -120,22 +139,27 @@ def generate_execution_order():
             LogUtils().errors(error_log)
             raise error_log
 
-    # 收集没有依赖的测试用例
-    sorted_fullpaths = {name_to_fullpath[name] for name in sorted_names}
-    no_deps_fullpaths = all_fullpaths - sorted_fullpaths
-    # 分配从1000开始的数字
-    no_deps_sorted = sorted(no_deps_fullpaths)  # 可选：按全路径排序
-    for idx, fullpath in enumerate(no_deps_sorted, start=1000):
-        execution_order.update({fullpath: idx})
+    # # 收集没有依赖的测试用例
+    # sorted_fullpaths = {name_to_fullpath[name] for name in sorted_names}
+    # no_deps_fullpaths = all_fullpaths - sorted_fullpaths
+    # # 分配从1000开始的数字
+    # no_deps_sorted = sorted(no_deps_fullpaths)  # 可选：按全路径排序
+    # for idx, fullpath in enumerate(no_deps_sorted, start=1000):
+    #     execution_order.update({fullpath: idx})
 
-    return execution_order
+    return Result(order=execution_order, name_to_fullpath=name_to_fullpath)
 
+
+# 测试
 if __name__ == "__main__":
     load_dotenv(r'C:\Users\hanyan\PycharmProjects\Selenium\env\.env')
     try:
-        order = generate_execution_order()
+        result = generate_execution_order()
+        order = result.order
         print("测试执行顺序:")
-        for item in order:
+        print(order.inverse[1])
+        print(order['test_home_page.py::TestHomePage::test_switch_layer'])
+        for item in order.items():
             print(item)
     except ValueError as e:
         print(e)

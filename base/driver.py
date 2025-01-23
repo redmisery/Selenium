@@ -63,7 +63,7 @@ class SessionManager:
             cookies = self.driver.get_cookies()
             cookies_path = self.session_path / f'{session_name}_cookies.pkl'
             cookies_path.write_bytes(pickle.dumps(cookies))
-            LogUtils().debug(f'Session saved as {session_name}_cookies.pkl')
+            LogUtils().debug(f'Session saved as {session_name}_cookies.pkl,cookies:{cookies}')
         except Exception as e:
             LogUtils().errors(f'Failed to save session: {e}')
 

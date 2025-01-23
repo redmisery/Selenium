@@ -28,28 +28,30 @@ class MySeleniumManager(SeleniumManager):
         args.append("json")
 
         env_vars = {
-            "SE_BROWSER": "--browser",                                  # chrome, firefox, edge, iexplorer, safari
-            "SE_DRIVER": "--driver",                                    # chromedriver, geckodriver, msedgedriver, IEDriverServer, or safaridriver
-            "SE_BROWSER_VERSION": "--browser-version",                  # 105, 106, etc
-            "SE_DRIVER_VERSION": "--driver-version",                    # e.g., 106.0.5249.61, 0.31.0, etc.
-            "SE_BROWSER_PATH": "--browser-path",                        # absolute path
-            "SE_DRIVER_MIRROR_URL": "--driver-mirror-url",              # Mirror URL for driver repositories
-            "SE_BROWSER_DOWNLOAD_URL": "--browser-download-url",        # URL to download the browser
-            "SE_BROWSER_MIRROR_URL": "--browser-mirror-url",            # Mirror URL for browser repositories
-            "SE_OUTPUT": "--output",                                    # utput type: LOGGER (using INFO, WARN, etc.), JSON (custom JSON notation), SHELL (Unix-like), or MIXED (INFO, WARN, DEBUG, etc. to stderr and minimal JSON to stdout). Default: LOGGER
-            "SE_OS": "--os",                                            # os name: windows, linux, or mac
-            "SE_ARCH": "--arch",                                        # architecture: x64, x86, arm, etc.
-            "SE_PROXY": "--proxy",                                      # proxy server address
-            "SE_TIMEOUT": "--timeout",                                  # timeout for network requests (in seconds). Default: 300
-            "SE_OFFLINE": "--offline",                                  # whether to use the offline mode. Default: false
-            "SE_FORCE_BROWSER_DOWNLOAD": "--force-browser-download",    # whether to force the browser to download even if it is already downloaded. Default: false
-            "SE_AVOID_BROWSER_DOWNLOAD": "--avoid-browser-download",    # whether to avoid downloading the browser if it is not found in the cache. Default: false
-            "SE_DEBUG": "--debug",                                      # whether to enable debug mode. Default: true
-            "SE_TRACE": "--trace",                                      # whether to enable trace mode. Default: false
-            "SE_CACHE_PATH": "--cache-path",                            # path to the cache directory. Default: ~/.cache/selenium
-            "SE_TTL": "--ttl",                                          # time-to-live for the cache (in seconds). Default: 3600
-            "SE_LANGUAGE_BINDING": "--language-binding",                # language binding: python, java, etc.
-            "SE_AVOID_STATS": "--avoid-stats"                           # Avoid sends usage statistics to plausible.io. Default: false
+            "SE_BROWSER": "--browser",  # chrome, firefox, edge, iexplorer, safari
+            "SE_DRIVER": "--driver",  # chromedriver, geckodriver, msedgedriver, IEDriverServer, or safaridriver
+            "SE_BROWSER_VERSION": "--browser-version",  # 105, 106, etc
+            "SE_DRIVER_VERSION": "--driver-version",  # e.g., 106.0.5249.61, 0.31.0, etc.
+            "SE_BROWSER_PATH": "--browser-path",  # absolute path
+            "SE_DRIVER_MIRROR_URL": "--driver-mirror-url",  # Mirror URL for driver repositories
+            "SE_BROWSER_DOWNLOAD_URL": "--browser-download-url",  # URL to download the browser
+            "SE_BROWSER_MIRROR_URL": "--browser-mirror-url",  # Mirror URL for browser repositories
+            "SE_OUTPUT": "--output",
+            # output type: LOGGER (using INFO, WARN, etc.), JSON (custom JSON notation), SHELL (Unix-like), or MIXED (INFO, WARN, DEBUG, etc. to stderr and minimal JSON to stdout). Default: LOGGER
+            "SE_OS": "--os",  # os name: windows, linux, or mac
+            "SE_ARCH": "--arch",  # architecture: x64, x86, arm, etc.
+            "SE_PROXY": "--proxy",  # proxy server address
+            "SE_TIMEOUT": "--timeout",  # timeout for network requests (in seconds). Default: 300
+            "SE_OFFLINE": "--offline",  # whether to use the offline mode. Default: false
+            "SE_FORCE_BROWSER_DOWNLOAD": "--force-browser-download",
+            # whether to force the browser to download even if it is already downloaded. Default: false
+            "SE_AVOID_BROWSER_DOWNLOAD": "--avoid-browser-download",  # whether to avoid downloading the browser if it is not found in the cache. Default: false
+            "SE_DEBUG": "--debug",  # whether to enable debug mode. Default: true
+            "SE_TRACE": "--trace",  # whether to enable trace mode. Default: false
+            "SE_CACHE_PATH": "--cache-path",  # path to the cache directory. Default: ~/.cache/selenium
+            "SE_TTL": "--ttl",  # time-to-live for the cache (in seconds). Default: 3600
+            "SE_LANGUAGE_BINDING": "--language-binding",  # language binding: python, java, etc.
+            "SE_AVOID_STATS": "--avoid-stats"  # Avoid sends usage statistics to plausible.io. Default: false
         }
 
         for env_var, cli_arg in env_vars.items():
@@ -58,7 +60,6 @@ class MySeleniumManager(SeleniumManager):
                 args.append(cli_arg)
                 if cli_arg not in ["--offline", "--force-browser-download", "--avoid-browser-download", "--debug", "--trace", "--avoid-stats"]:
                     args.append(env_value)
-
         return self._run(args)
 
 
@@ -95,17 +96,18 @@ class MyDriverFinder(DriverFinder):
             raise NoSuchDriverException(msg) from err
         return self._paths
 
+
 class MyChromiumDriver(ChromiumDriver):
     """Controls the WebDriver instance of ChromiumDriver and allows you to
     drive the browser."""
 
     def __init__(
-        self,
-        browser_name: str = None,
-        vendor_prefix: str = None,
-        options: ArgOptions = ArgOptions(),
-        service: Service = None,
-        keep_alive: bool = True,
+            self,
+            browser_name: str = None,
+            vendor_prefix: str = None,
+            options: ArgOptions = ArgOptions(),
+            service: Service = None,
+            keep_alive: bool = True,
     ) -> None:
         """Creates a new WebDriver instance of the ChromiumDriver. Starts the
         service and then creates new WebDriver instance of ChromiumDriver.
@@ -137,21 +139,22 @@ class MyChromiumDriver(ChromiumDriver):
 
         try:
             # 调用父类的父类
-            super(ChromiumDriver,self).__init__(command_executor=executor, options=options)
+            super(ChromiumDriver, self).__init__(command_executor=executor, options=options)
         except Exception:
             self.quit()
             raise
 
         self._is_remote = False
 
+
 class WebDriver(MyChromiumDriver):
     """重写WebDrive类，使其使用chrome浏览器"""
 
     def __init__(
-        self,
-        options: Options = None,
-        service: Service = None,
-        keep_alive: bool = True,
+            self,
+            options: Options = None,
+            service: Service = None,
+            keep_alive: bool = True,
     ) -> None:
         """Creates a new instance of the chrome driver. Starts the service and
         then creates new instance of chrome driver.
