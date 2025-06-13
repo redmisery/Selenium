@@ -15,7 +15,14 @@ from selenium.webdriver.common.selenium_manager import SeleniumManager
 
 logger = logging.getLogger(__name__)
 
+# 核心代码介绍：
+# 1. 定义MySeleniumManager类，继承SeleniumManager类，重写binary_paths方法，使用MySeleniumManager类代替SeleniumManager类。
+# 2. 定义MyDriverFinder类，继承DriverFinder类，重写_binary_paths方法，使用MySeleniumManager类代替SeleniumManager类。
+# 3. 定义MyChromiumDriver类，继承ChromiumDriver类，重写__init__方法，使用MyDriverFinder类代替DriverFinder类。
+# 4. 定义WebDriver类，继承MyChromiumDriver类，重写__init__方法，使用chrome浏览器。
+# 5. 调用WebDriver类，创建chrome浏览器实例。
 
+# 代码实现：
 class MySeleniumManager(SeleniumManager):
     def binary_paths(self, args: List) -> dict:
         args = [str(self._get_binary())] + args
@@ -27,6 +34,7 @@ class MySeleniumManager(SeleniumManager):
         args.append("--output")
         args.append("json")
 
+        # 修改的部分：增加对以下环境变量的支持
         env_vars = {
             "SE_BROWSER": "--browser",  # chrome, firefox, edge, iexplorer, safari
             "SE_DRIVER": "--driver",  # chromedriver, geckodriver, msedgedriver, IEDriverServer, or safaridriver

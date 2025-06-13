@@ -4,6 +4,9 @@ from page_object import Index
 
 
 class TestLogin:
+    """
+    登录测试
+    """
     index = Index()
     driver = Driver().driver
 

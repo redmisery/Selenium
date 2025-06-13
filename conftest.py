@@ -4,8 +4,7 @@ from pathlib import Path
 import pytest
 
 from base import Driver
-from common import Excel, LogUtils, Env, Config, PublicData
-from common import generate_execution_order
+from common import Excel, LogUtils, Env, Config, PublicData, generate_execution_order
 
 all_test_data: [dict] = {}
 data_length: [defaultdict] = {}
@@ -14,11 +13,13 @@ order_fullpath = generate_execution_order()
 
 def pytest_addoption(parser):
     # 注册自定义配置项
+    LogUtils().debug("pytest_addoption函数被调用，开始注册自定义配置项")
     parser.addini("data_sources", help="Specify the data sources for tests", default="excel")
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_configure(config):
+    LogUtils().debug("pytest_configure函数被调用，开始初始化配置项")
     global all_test_data
     global data_length
     # 检查环境变量
@@ -62,12 +63,14 @@ def pytest_configure(config):
 # 显式声明data
 @pytest.fixture(scope="session")
 def data(request):
+    LogUtils().debug("data fixture被调用，开始加载测试数据")
     param = request.param if hasattr(request, "param") and request.param else None
     return param
 
 
 # 钩子函数对data参数化
 def pytest_generate_tests(metafunc):
+    LogUtils().debug("pytest_generate_tests函数被调用，开始对data参数化")
     if "data" in metafunc.fixturenames:
         # 获取函数名
         function_name = metafunc.function.__name__
@@ -77,17 +80,16 @@ def pytest_generate_tests(metafunc):
         global all_test_data
         try:
             excel_data = all_test_data[test_filename][function_name]
+            # 解析数据
+            data = PublicData.data_parse(excel_data)
+            # indirect=True 表明data参数是通过fixture注入的，该数据直接传递到data fixture
+            metafunc.parametrize("data", data, scope="function", indirect=True)
         except KeyError as e:
-            error_log = f"未找到测试数据文件{test_filename}中{function_name}的测试数据"
-            LogUtils().error(error_log)
-            raise Exception(error_log) from e
-        # 解析数据
-        data = PublicData.data_parse(excel_data)
-        # indirect=True 表明data参数是通过fixture注入的，该数据直接传递到data fixture
-        metafunc.parametrize("data", data, scope="function", indirect=True)
+            return None
 
 
 def pytest_collection_modifyitems(config, items):
+    LogUtils().debug("pytest_collection_modifyitems函数被调用，开始添加测试依赖关系")
     # 生成执行顺序列表
     global order_fullpath
     global data_length
@@ -97,12 +99,16 @@ def pytest_collection_modifyitems(config, items):
 
     # 获取配置
     data_chain_dependency_mode = Config.getini('data', 'data_chain_dependency_mode', bool)
+    function_dependency_mode = Config.getini('data', 'function_dependency_mode', bool)
 
     # 添加测试用例执行顺序,注意，排序超过10000时，排序将失效，只适用于小于10000的排序
     for item in items:
         item_fullpath = item.nodeid.split('[')[0].split('/')[1]
-        item_loop = item.callspec.indices.get('__pytest_repeat_step_number', 0)
-        order = execute_order.get(item_fullpath)
+        if data_chain_dependency_mode:
+            item_loop = item.callspec.indices.get('__pytest_repeat_step_number', 0)
+        else:
+            item_loop = 0
+        order = execute_order.get(item_fullpath, -1)
         item.add_marker(pytest.mark.run(order=order + item_loop * 10000))
 
     # 数据链式依赖,以下为过滤规则：每一轮session重复测试只有一组数据，且数据按照顺序执行
@@ -147,7 +153,7 @@ def pytest_collection_modifyitems(config, items):
         module_name = item.module.__name__ + '.py'
         class_name = item.cls.__name__ if item.cls else None
         func_name = item.originalname
-        item_loop = item.callspec.indices.get('__pytest_repeat_step_number')
+        item_loop = item.callspec.indices.get('__pytest_repeat_step_number') if data_chain_dependency_mode else None
         dependency_config = Config.dependency_config()
 
         # 检查是否有配置文件中的依赖关系
@@ -157,17 +163,25 @@ def pytest_collection_modifyitems(config, items):
                 class_deps = module_deps[class_name]
                 if func_name in class_deps:
                     dep_info = class_deps[func_name]
+                    # 若是函数独立依赖，则name使用该item的全路径，否则不使用name，使用node_id
+                    name = f'{module_name}::{class_name}::{func_name}' if function_dependency_mode else None
                     scope = dep_info.get('scope', 'session')
                     depends = []
                     if dep_info.get('depends'):
                         for dep in dep_info.get('depends'):
                             if dep in name_to_fullpath:
-                                depends.append(get_node_id(name_to_fullpath[dep], item_loop))
+                                if data_chain_dependency_mode:
+                                    # 依赖取决于数据链
+                                    depends.append(get_node_id(name_to_fullpath[dep], item_loop))
+                                if function_dependency_mode:
+                                    # 依赖取决于函数名称全路径
+                                    depends.append(name_to_fullpath[dep])
                             else:
                                 LogUtils().errors(f"未找到依赖项{dep}，请检查依赖项名称是否正确")
                     # 动态添加 dependency marker
                     item.add_marker(
                         pytest.mark.dependency(
+                            name=name,
                             scope=scope,
                             depends=depends
                         )
@@ -176,6 +190,7 @@ def pytest_collection_modifyitems(config, items):
 
 @pytest.fixture(scope="class", autouse=True)
 def session_load():
+    LogUtils().debug("session_load fixture被调用，开始加载session")
     # 加载session
     Driver().sessionManger.load_session("login")
 
@@ -186,6 +201,7 @@ global cur_item
 # 获取测试后的数据
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item):
+    LogUtils().debug("pytest_runtest_makereport函数被调用，开始获取测试后的数据")
     outcome = yield
     report = outcome.get_result()
     global cur_item
@@ -202,6 +218,7 @@ def pytest_runtest_makereport(item):
 
 # 测试函数日志收集
 def pytest_runtest_logreport(report):
+    LogUtils().debug("pytest_runtest_logreport函数被调用，开始收集测试日志")
     global cur_item
     log_utils = LogUtils()
     node_id = cur_item.nodeid  # 获取测试用例的唯一标识符

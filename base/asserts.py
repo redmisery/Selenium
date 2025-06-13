@@ -93,7 +93,6 @@ class Asserts:
         断言，支持两种使用方式
         方式1: 传入断言数据字典，包含预期结果和断言类型
         方式2: 传入预期结果和断言类型，预期结果为字符串
-        :param data: 断言数据字典或预期结果
         :param data: 测试数据
         :param result: 运行结果
         :param assert_type: 断言类型
@@ -125,7 +124,8 @@ class Asserts:
 
         # 执行断言
         success, log = assert_mapping[assert_type](result, expect)
-        if isinstance(data,dict):
+        # 记录断言结果
+        if isinstance(data, dict):
             data.update({'assert_result': log})
         else:
             LogUtils().infos(log)
