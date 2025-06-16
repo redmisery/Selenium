@@ -2,3 +2,5 @@ logs
 .wdm
 venv
 trash
+__pycache__
+.vscode/*
